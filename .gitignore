@@ -1,0 +1,15 @@
+# IDE configurations
+.vscode/
+
+# Build output
+dist/
+
+# Dependency directories
+node_modules/
+
+# Test output
+test-results/
+
+# System files
+.DS_Store
+Thumbs.db
