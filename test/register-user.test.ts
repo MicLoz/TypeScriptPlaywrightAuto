@@ -1,3 +1,4 @@
+// \Users\Mikel\PycharmProjects\TypeScriptPlaywrightAuto\test\register-user.test.ts
 import { test, expect, Page } from '@playwright/test';
 import { launchBrowser } from '../test_utils/test-utils';
 import { Faker, en } from '@faker-js/faker';
