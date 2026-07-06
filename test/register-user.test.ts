@@ -1,46 +1,23 @@
 // \Users\Mikel\PycharmProjects\TypeScriptPlaywrightAuto\test\register-user.test.ts
 
 import { test } from '@playwright/test';
+
 import { launchBrowser } from '../test_utils/test-utils';
 import { dismissConsentPopup } from '../test_utils/ui-guards';
-import { Faker, en } from '@faker-js/faker';
+import { TestDataFactory, TestUser } from '../test_utils/test-data-factory';
 
 import { SignupPage } from '../pages/signup-page';
 import { AccountPage } from '../pages/account-page';
 
-const customFaker = new Faker({ locale: [en] });
-
-// ---- Test Data Constants ----
-
-const TEST_PASSWORD = 'password123';
-
-const TEST_ADDRESS = {
-    line1: '123 Test St',
-    line2: 'Testbury',
-    country: 'United States',
-    state: 'California',
-    city: 'Test City',
-    postcode: '12345',
-    phone: '1234567890'
-};
 
 test.describe('User Registration Tests', () =>
 {
-    let randomFirstName: string;
-    let randomLastName: string;
-    let randomFullName: string;
-    let randomEmail: string;
-    let randomDOB: Date;
-    let gender: string;
+    let user: TestUser;
+
 
     test.beforeEach(() =>
     {
-        randomFirstName = customFaker.person.firstName();
-        randomLastName = customFaker.person.lastName();
-        randomFullName = `${randomFirstName} ${randomLastName}`;
-        randomEmail = customFaker.internet.email();
-        randomDOB = customFaker.date.birthdate();
-        gender = Math.random() > 0.5 ? 'id_gender1' : 'id_gender2';
+        user = TestDataFactory.createUser();
     });
 
 
@@ -67,35 +44,40 @@ test.describe('User Registration Tests', () =>
 
             // Create account
             await signupPage.startSignup(
-                randomFullName,
-                randomEmail
+                user.fullName,
+                user.email
             );
+
 
             // Complete account details
             await accountPage.fillAccountInfo({
-                gender,
-                fullName: randomFullName,
-                password: TEST_PASSWORD,
-                dob: randomDOB
+                gender: user.gender,
+                fullName: user.fullName,
+                password: user.password,
+                dob: user.dob
             });
 
-            await accountPage.fillAddress(
-            {
-                firstName: randomFirstName,
-                lastName: randomLastName,
-                address: TEST_ADDRESS
+
+            await accountPage.fillAddress({
+                firstName: user.firstName,
+                lastName: user.lastName,
+                address: user.address
             });
+
 
             // Submit account creation
             await accountPage.submitAccountCreation();
 
             accountCreated = true;
 
+
             // Continue after creation
             await accountPage.continueAfterCreation();
 
+
             // Validate login
-            await signupPage.assertLoggedIn(randomFullName);
+            await signupPage.assertLoggedIn(user.fullName);
+
         }
         finally
         {
