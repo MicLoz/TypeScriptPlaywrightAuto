@@ -1,6 +1,7 @@
 // \Users\Mikel\PycharmProjects\TypeScriptPlaywrightAuto\test\register-user.test.ts
 import { test, expect, Page } from '@playwright/test';
 import { launchBrowser } from '../test_utils/test-utils';
+import { dismissConsentPopup } from '../test_utils/ui-guards';
 import { Faker, en } from '@faker-js/faker';
 
 // Initialize Faker instance
@@ -32,6 +33,7 @@ test.describe('User Registration Tests', () =>
 
         // Launch browser and navigate
         await launchBrowser(page, url, timeout);
+        await dismissConsentPopup(page);
 
         // Navigate to Signup
         await page.click('a[href="/login"]');
