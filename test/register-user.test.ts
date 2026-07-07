@@ -9,6 +9,8 @@ import { TestDataFactory, TestUser } from '../test_utils/test-data-factory';
 import { SignupPage } from '../pages/signup-page';
 import { AccountPage } from '../pages/account-page';
 
+import { RegistrationWorkflow } from '../workflows/registration-workflow';
+
 
 test.describe('User Registration Tests', () =>
 {
@@ -25,68 +27,49 @@ test.describe('User Registration Tests', () =>
     {
         let accountCreated = false;
 
+
         const signupPage = new SignupPage(page);
         const accountPage = new AccountPage(page);
-
-        const url = 'http://automationexercise.com/';
-        const timeout = 60000;
 
 
         try
         {
-            await launchBrowser(page, url, timeout);
-            await dismissConsentPopup(page);
-
-
-            // Navigate to signup
-            await signupPage.navigateToLogin();
-
-
-            // Create account
-            await signupPage.startSignup(
-                user.fullName,
-                user.email
+            await launchBrowser(
+                page,
+                'http://automationexercise.com/',
+                60000
             );
 
 
-            // Complete account details
-            await accountPage.fillAccountInfo({
-                gender: user.gender,
-                fullName: user.fullName,
-                password: user.password,
-                dob: user.dob
-            });
+            await dismissConsentPopup(page);
 
 
-            await accountPage.fillAddress({
-                firstName: user.firstName,
-                lastName: user.lastName,
-                address: user.address
-            });
+            await signupPage.navigateToLogin();
 
 
-            // Submit account creation
-            await accountPage.submitAccountCreation();
+            await RegistrationWorkflow.register(
+                signupPage,
+                accountPage,
+                user
+            );
+
 
             accountCreated = true;
 
 
-            // Continue after creation
             await accountPage.continueAfterCreation();
 
 
-            // Validate login
-            await signupPage.assertLoggedIn(user.fullName);
-
+            await signupPage.assertLoggedIn(
+                user.fullName
+            );
         }
         finally
         {
-            // Cleanup only if account exists
             if (accountCreated)
             {
                 await accountPage.deleteAccount();
             }
         }
-
     });
 });
